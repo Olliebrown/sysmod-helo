@@ -1,6 +1,10 @@
 
 build/
+out/
 *.ovl
 *.elf
 *.nacp
 *.nro
+.devcontainer
+node_modules
+.DS_Store
