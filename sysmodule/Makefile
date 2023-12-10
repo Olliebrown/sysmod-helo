@@ -19,9 +19,9 @@ include $(DEVKITPRO)/libnx/switch_rules
 #---------------------------------------------------------------------------------
 TARGET		:=	sys-helo
 BUILD		:=	build
-SOURCES		:=	source
+SOURCES		:=	source ../common/src
 DATA		:=	data
-INCLUDES	:=	include
+INCLUDES	:=	../common/include
 
 OUTDIR		:=	out
 LIBNAMES	:=	minIni nxExt

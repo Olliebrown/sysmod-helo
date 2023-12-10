@@ -6,9 +6,11 @@
 // Include the main libnx system header, for Switch development
 #include <switch.h>
 
-// Utilities for errors and logging
+// Utilities for errors, logging, and IPC
 #include "errors.h"
 #include "file_utils.h"
+#include "process_management.h"
+#include "ipc_service.h"
 
 // Size of the inner heap (adjust as necessary).
 #define INNER_HEAP_SIZE 0x80000
@@ -19,6 +21,8 @@ extern "C" {
 
 // Sysmodules should not use applet*.
 u32 __nx_applet_type = AppletType_None;
+
+TimeServiceType __nx_time_service_type = TimeServiceType_System;
 
 // Sysmodules will normally only want to use one FS session.
 u32 __nx_fs_num_sessions = 1;
@@ -84,15 +88,30 @@ int main(int argc, char* argv[])
         // More initialization
         FileUtils::LogLine("Initializing ...");
 
+        // Static process initialization
+        ProcessManagement::Initialize();
+        ProcessManagement::WaitForQLaunch();
+
+        // TODO: Make sysmod manager and pass to IpcService
+        IpcService* ipcSrv = new IpcService();
+
         // Log that initialization is done
         FileUtils::LogLine("Ready");
-        
+
+        // TODO: Start sysmod manager and indicate enabled in config
+
+        // Start IPC service        
+        ipcSrv->SetRunning(true);
+
         // Main loop / core
-        // while (true)
-        // {
-        // }
+        // TODO: While sysmod manager is running, tick and wait
 
         // Shutdown & cleanup
+        ipcSrv->SetRunning(false);
+        delete ipcSrv;
+
+        // Static process deinitialization
+        ProcessManagement::Exit();
     }
     catch (const std::exception &ex)
     {

@@ -10,7 +10,8 @@ const SWITCH_CONFIG = {
   secure: false
 }
 
-const FROM_DIR = path.join('..', 'out')
+const SYSMOD_FROM_DIR = path.join('..', 'sysmodule', 'out')
+const OVERLAY_FROM_DIR = path.join('..', 'overlay', 'out')
 
 async function touchFile (filename) {
   try {
@@ -33,17 +34,23 @@ async function uploadSysmod () {
     // Upload config files (log directory)
     await client.ensureDir('/config/sys-helo')
     await client.clearWorkingDir()
-    await touchFile(path.join(FROM_DIR, 'log.flag'))
-    await client.uploadFrom(path.join(FROM_DIR, 'log.flag'), 'log.flag')
+    await touchFile(path.join(SYSMOD_FROM_DIR, 'log.flag'))
+    await client.uploadFrom(path.join(SYSMOD_FROM_DIR, 'log.flag'), 'log.flag')
 
+    // Upload sys module nsp
     await client.ensureDir('/atmosphere/contents/0100000000000234')
     await client.clearWorkingDir()
-    await client.uploadFrom(path.join(FROM_DIR, 'sys-helo.nsp'), 'exefs.nsp')
+    await client.uploadFrom(path.join(SYSMOD_FROM_DIR, 'sys-helo.nsp'), 'exefs.nsp')
 
+    // Set the boot flag
     await client.ensureDir('/atmosphere/contents/0100000000000234/flags')
     await client.clearWorkingDir()
-    await touchFile(path.join(FROM_DIR, 'boot2.flag'))
-    await client.uploadFrom(path.join(FROM_DIR, 'boot2.flag'), 'boot2.flag')
+    await touchFile(path.join(SYSMOD_FROM_DIR, 'boot2.flag'))
+    await client.uploadFrom(path.join(SYSMOD_FROM_DIR, 'boot2.flag'), 'boot2.flag')
+
+    // Upload overlay
+    await client.ensureDir('/switch/.overlays')
+    await client.uploadFrom(path.join(OVERLAY_FROM_DIR, 'overlay.ovl'), 'sys-helo.ovl')
   } catch (err) {
     // Log any errors
     console.error('FTP Error:')

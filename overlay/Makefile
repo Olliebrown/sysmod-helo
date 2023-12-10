@@ -27,8 +27,8 @@ include $(DEVKITPRO)/libnx/switch_rules
 #     - icon.jpg
 #     - <libnx folder>/default_icon.jpg
 #---------------------------------------------------------------------------------
-APP_TITLE	:=	Tesla Overlay Template
-APP_VERSION :=	1.0.0
+APP_TITLE	:=	Sys-helo Overlay
+APP_VERSION :=	0.0.1
 
 TARGET		:=	$(notdir $(CURDIR))
 BUILD		:=	build

@@ -1,12 +1,22 @@
 {
     "cSpell.words": [
+        "exefs",
+        "helo",
         "hosversion",
         "initheap",
         "libnx",
+        "libtesla",
         "MAKEHOSVERSION",
         "MAKERESULT",
         "Newlib",
+        "Npad",
+        "pmdmnt",
+        "pminfo",
+        "QLAUNCH",
         "setsys",
+        "syshelo",
+        "Sysmod",
+        "sysmodule",
         "Sysmodules"
     ]
 }
