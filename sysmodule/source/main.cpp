@@ -10,9 +10,6 @@
 #include "errors.h"
 #include "file_utils.h"
 
-// Inter-process communication
-#include "ipc_service.h"
-
 // Size of the inner heap (adjust as necessary).
 #define INNER_HEAP_SIZE 0x80000
 
@@ -86,20 +83,16 @@ int main(int argc, char* argv[])
     {
         // More initialization
         FileUtils::LogLine("Initializing ...");
-        IpcService* ipcSrv = new IpcService();
 
         // Log that initialization is done
         FileUtils::LogLine("Ready");
         
         // Main loop / core
-        ipcSrv->SetRunning(true);
         // while (true)
         // {
         // }
 
         // Shutdown & cleanup
-        ipcSrv->SetRunning(false);
-        delete ipcSrv;
     }
     catch (const std::exception &ex)
     {
