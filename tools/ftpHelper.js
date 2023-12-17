@@ -61,3 +61,9 @@ export async function uploadFile (client, fromDir, fromFile, toDir, toFile, clea
   if (clearDir) { await client.clearWorkingDir() }
   await client.uploadFrom(path.join(fromDir, fromFile), toFile)
 }
+
+// Download a remote file to the destination
+export async function downloadFile (client, fromDir, fromFile, toDir, toFile) {
+  await client.cd(fromDir)
+  await client.downloadTo(path.join(toDir, toFile), fromFile)
+}
