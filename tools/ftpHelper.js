@@ -15,6 +15,21 @@ const SWITCH_CONFIG = {
   secure: false
 }
 
+// Log progress for any transfer from now on.
+function logProgress (info) {
+  process.stdout.clearLine(0)
+  process.stdout.cursorTo(0)
+
+  const kBytes = (info.bytes / 1024).toFixed(0)
+  const kBytesOverall = (info.bytesOverall / 1024).toFixed(0)
+  const percent = (info.bytes / info.bytesOverall * 100).toFixed(0)
+  process.stdout.write(`> ${info.name} (${info.type}): ${kBytes}/${kBytesOverall} KB (${percent}%)`)
+
+  if (info.bytesOverall !== 0 && info.bytes === info.bytesOverall) {
+    process.stdout.write('\n')
+  }
+}
+
 // Create a new empty file locally
 async function touchFile (filename) {
   try {
@@ -47,23 +62,38 @@ export async function connectAndAction (actionCallback) {
   }
 }
 
-// Ensure a file exists on the destination with given name (an no contents)
-export async function ensureFileExists (client, filename, fromDir, toDir) {
+// Ensure a file exists on the destination with given name (and no contents)
+export async function ensureFileExists (client, filename, fromDir, toDir, clearDir = false) {
   await client.ensureDir(toDir)
-  await client.clearWorkingDir()
+  if (clearDir) { await client.clearWorkingDir() }
   await touchFile(path.join(fromDir, filename))
+  process.stdout.write(`> ${filename} (set flag)\n`)
   await client.uploadFrom(path.join(fromDir, filename), filename)
 }
 
+export async function ensureFileDoesNotExist (client, filename, toDir) {
+  try {
+    await client.remove(`${toDir}/${filename}`)
+  } catch (err) {
+    if (err.code !== 550) {
+      throw err
+    }
+  }
+}
+
 // Upload a local file to the destination
-export async function uploadFile (client, fromDir, fromFile, toDir, toFile, clearDir = true) {
+export async function uploadFile (client, fromDir, fromFile, toDir, toFile, clearDir = false) {
   await client.ensureDir(toDir)
   if (clearDir) { await client.clearWorkingDir() }
+  client.trackProgress(logProgress)
   await client.uploadFrom(path.join(fromDir, fromFile), toFile)
+  client.trackProgress()
 }
 
 // Download a remote file to the destination
 export async function downloadFile (client, fromDir, fromFile, toDir, toFile) {
   await client.cd(fromDir)
+  client.trackProgress(logProgress)
   await client.downloadTo(path.join(toDir, toFile), fromFile)
+  client.trackProgress()
 }

@@ -42,7 +42,7 @@ static inline uint64_t sysHeloDefaultConfigValue(SysHeloConfigValue val)
     switch(val)
     {
         case sysHeloConfigValue_TickIntervalMs:
-            return 1000ULL;
+            return 300ULL;
         default:
             return 0ULL;
     }

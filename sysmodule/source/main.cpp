@@ -3,6 +3,9 @@
 #include <stdlib.h>
 #include <string.h>
 
+// Time tracking
+#include <sys/time.h>
+
 // Include the main libnx system header, for Switch development
 #include <switch.h>
 
@@ -107,10 +110,24 @@ int main(int argc, char* argv[])
         ipcSrv->SetRunning(true);
 
         // Main loop / core
+        uint64_t tickCount = 0;
+        struct timeval lastTimeVal;
+        struct timeval curTimeVal;
+        gettimeofday(&lastTimeVal, NULL);
         while (heloMgr->Running())
         {
             heloMgr->Tick();
             heloMgr->WaitForNextTick();
+            tickCount++;
+
+            gettimeofday(&curTimeVal, NULL);
+            uint64_t elapsed = curTimeVal.tv_sec - lastTimeVal.tv_sec;
+            if (elapsed > 5)
+            {
+                FileUtils::LogLine("Ping (%.2f TPS)", tickCount/(float)elapsed);
+                lastTimeVal = curTimeVal;
+                tickCount = 0;
+            }
         }
 
         // Shutdown & cleanup
