@@ -4,7 +4,7 @@
 
 // Whenever the IPC commands listed below change, increment this version number
 #define SYSHELO_IPC_API_VERSION 1
-#define SYSHELO_IPC_SERVICE_NAME "sys:helo"
+#define SYSHELO_IPC_SERVICE_NAME "sys-helo"
 
 // Enumeration of custom commands that can be sent over IPC
 // NOTE: Client functions for these commands are declared in

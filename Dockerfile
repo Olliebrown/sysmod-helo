@@ -22,6 +22,9 @@ RUN apt-get update && apt-get install -y build-essential && \
     echo "deb-src http://apt.llvm.org/bullseye/ llvm-toolchain-bullseye-12 main" >> /etc/apt/sources.list - && \
     apt-get update && apt-get install -y clang-format-12
 
+# Install imagemagick
+RUN apt-get update && apt-get install -y imagemagick
+
 # Setup node distro site with key
 RUN mkdir -p /etc/apt/keyrings && \
     curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | \
