@@ -79,6 +79,12 @@ bool Config::Refresh()
     return false;
 }
 
+bool Config::HasLoaded()
+{
+    std::scoped_lock lock{this->configMutex};
+    return this->loaded;
+}
+
 time_t Config::CheckModificationTime()
 {
     time_t mtime = 0;

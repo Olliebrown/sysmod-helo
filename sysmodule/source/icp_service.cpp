@@ -4,7 +4,7 @@
 #include "file_utils.h"
 #include "errors.h"
 
-IpcService::IpcService()
+IpcService::IpcService(HeloManager* heloMgr)
 {
     std::int32_t priority;
     Result rc = svcGetThreadPriority(&priority, CUR_THREAD_HANDLE);
@@ -15,6 +15,7 @@ IpcService::IpcService()
     ASSERT_RESULT_OK(rc, "threadCreate");
 
     this->running = false;
+    this->heloMgr = heloMgr;
 }
 
 void IpcService::SetRunning(bool running)
@@ -29,11 +30,13 @@ void IpcService::SetRunning(bool running)
 
     if(running)
     {
+        FileUtils::LogLine("[ipc] ipcServerProcess: Starting IPC thread");
         Result rc = threadStart(&this->thread);
         ASSERT_RESULT_OK(rc, "threadStart");
     }
     else
     {
+        FileUtils::LogLine("[ipc] ipcServerProcess: Stopping IPC thread");
         svcCancelSynchronization(this->thread.handle);
         threadWaitForExit(&this->thread);
     }
@@ -52,6 +55,7 @@ void IpcService::ProcessThreadFunc(void* arg)
 {
     Result rc;
     IpcService* ipcSrv = (IpcService*)arg;
+    FileUtils::LogLine("[ipc] ipcServerProcess: Initiating IPC thread event loop");
     while(true)
     {
         rc = ipcServerProcess(&ipcSrv->server, &IpcService::ServiceHandlerFunc, arg);
@@ -138,55 +142,56 @@ Result IpcService::GetVersionString(char* out_buf, size_t bufSize)
 
 Result IpcService::GetCurrentContext(SysHeloContext* out_ctx)
 {
-    // TODO: Retrieve current context and assign to out_ctx
-    // *out_ctx = this->clockMgr->GetCurrentContext();
+    // Retrieve current context and assign to out_ctx
+    *out_ctx = this->heloMgr->GetCurrentContext();
 
     return 0;
 }
 
 Result IpcService::Exit()
 {
-    // TODO: Stop main service
+    // Stop main service
+    this->heloMgr->SetRunning(false);
 
     return 0;
 }
 
 Result IpcService::SetEnabled(std::uint8_t* enabled)
 {
-    // TODO: Retrieve config and update enabled value
+    // Retrieve config and update enabled value
+    Config* config = this->heloMgr->GetConfig();
+    config->SetEnabled(*enabled);
 
     return 0;
 }
 
 Result IpcService::GetConfigValues(SysHeloConfigValueList* out_configValues)
 {
-    // TODO: Retrieve config and return config values
-    // Config* config = this->clockMgr->GetConfig();
-    // if(!config->HasProfilesLoaded())
-    // {
-    //     return SYSHELO_ERROR(ConfigNotLoaded);
-    // }
+    // Retrieve config and return config values
+    Config* config = this->heloMgr->GetConfig();
+    if(!config->HasLoaded())
+    {
+        return SYSHELO_ERROR(ConfigNotLoaded);
+    }
 
-    // config->GetConfigValues(out_configValues);
-
+    config->GetConfigValues(out_configValues);
     return 0;
 }
 
 Result IpcService::SetConfigValues(SysHeloConfigValueList* configValues)
 {
-    // TODO: Retrieve config and update config values
-    // Config* config = this->clockMgr->GetConfig();
-    // if(!config->HasProfilesLoaded())
-    // {
-    //     return SYSHELO_ERROR(ConfigNotLoaded);
-    // }
+    // Retrieve config and update config values
+    Config* config = this->heloMgr->GetConfig();
+    if(!config->HasLoaded())
+    {
+        return SYSHELO_ERROR(ConfigNotLoaded);
+    }
 
-    // SysHeloConfigValueList configValuesCopy = *configValues;
-
-    // if(!config->SetConfigValues(&configValuesCopy, true))
-    // {
-    //     return SYSHELO_ERROR(ConfigSaveFailed);
-    // }
+    SysHeloConfigValueList configValuesCopy = *configValues;
+    if(!config->SetConfigValues(&configValuesCopy, true))
+    {
+        return SYSHELO_ERROR(ConfigSaveFailed);
+    }
 
     return 0;
 }

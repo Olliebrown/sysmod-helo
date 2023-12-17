@@ -14,10 +14,12 @@
 #include <nxExt.h>
 #include <syshelo.h>
 
+#include "helo_manager.h"
+
 class IpcService
 {
   public:
-    IpcService();
+    IpcService(HeloManager* heloMgr);
     virtual ~IpcService();
     void SetRunning(bool running);
 
@@ -37,4 +39,5 @@ class IpcService
     Thread thread;
     LockableMutex threadMutex;
     IpcServer server;
+    HeloManager* heloMgr;
 };

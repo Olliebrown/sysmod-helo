@@ -22,6 +22,7 @@ class Config
     static Config* CreateDefault();
 
     bool Refresh();
+    bool HasLoaded();
 
     void SetEnabled(bool enabled);
     bool Enabled();

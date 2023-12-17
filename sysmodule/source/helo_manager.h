@@ -27,6 +27,7 @@ class HeloManager
 
     void SetRunning(bool running);
     bool Running();
+
     void Tick();
     void WaitForNextTick();
 

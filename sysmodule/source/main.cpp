@@ -92,23 +92,31 @@ int main(int argc, char* argv[])
         ProcessManagement::Initialize();
         ProcessManagement::WaitForQLaunch();
 
-        // TODO: Make sysmod manager and pass to IpcService
-        IpcService* ipcSrv = new IpcService();
+        // Make sysmod manager and IpcService
+        HeloManager* heloMgr = new HeloManager();
+        IpcService* ipcSrv = new IpcService(heloMgr);
 
         // Log that initialization is done
         FileUtils::LogLine("Ready");
 
-        // TODO: Start sysmod manager and indicate enabled in config
+        // Start sysmod manager and indicate enabled in config
+        heloMgr->SetRunning(true);
+        heloMgr->GetConfig()->SetEnabled(true);
 
         // Start IPC service        
         ipcSrv->SetRunning(true);
 
         // Main loop / core
-        // TODO: While sysmod manager is running, tick and wait
+        while (heloMgr->Running())
+        {
+            heloMgr->Tick();
+            heloMgr->WaitForNextTick();
+        }
 
         // Shutdown & cleanup
         ipcSrv->SetRunning(false);
         delete ipcSrv;
+        delete heloMgr;
 
         // Static process deinitialization
         ProcessManagement::Exit();
