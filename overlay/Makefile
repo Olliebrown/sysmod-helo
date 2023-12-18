@@ -32,7 +32,7 @@ APP_VERSION :=	0.0.1
 
 TARGET		:=	$(notdir $(CURDIR))
 BUILD		:=	build
-SOURCES		:=	source
+SOURCES		:=	source source/ui/gui ../common/source/client
 DATA		:=	data
 INCLUDES	:=	include libs/libtesla/include ../common/include
 
@@ -40,8 +40,16 @@ OUTDIR		:=	out
 NO_ICON		:=  1
 
 #---------------------------------------------------------------------------------
+# version control constants
+#---------------------------------------------------------------------------------
+TARGET_VERSION	:= $(shell git describe --dirty --always --tags)
+APP_VERSION		:= $(TARGET_VERSION)
+
+#---------------------------------------------------------------------------------
 # options for code generation
 #---------------------------------------------------------------------------------
+DEFINES	:=	-DDISABLE_IPC -DTARGET="\"$(TARGET)\"" -DTARGET_VERSION="\"$(TARGET_VERSION)\""
+
 ARCH		:=	-march=armv8-a+crc+crypto -mtune=cortex-a57 -mtp=soft -fPIE
 
 CFLAGS		:=	-g -Wall -O2 -ffunction-sections $(ARCH) $(DEFINES) \
@@ -94,64 +102,21 @@ else
 endif
 #---------------------------------------------------------------------------------
 
-export OFILES_BIN	:=	$(addsuffix .o,$(BINFILES))
-export OFILES_SRC	:=	$(CPPFILES:.cpp=.o) $(CFILES:.c=.o) $(SFILES:.s=.o)
-export OFILES 		:=	$(OFILES_BIN) $(OFILES_SRC)
-export HFILES_BIN	:=	$(addsuffix .h,$(subst .,_,$(BINFILES)))
+export OFILES	:=	$(addsuffix .o,$(BINFILES)) \
+			$(CPPFILES:.cpp=.o) $(CFILES:.c=.o) $(SFILES:.s=.o)
 
 export INCLUDE	:=	$(foreach dir,$(INCLUDES),-I$(CURDIR)/$(dir)) \
-					$(foreach dir,$(LIBDIRS),-I$(dir)/include) \
-					-I$(CURDIR)/$(BUILD)
+			$(foreach dir,$(LIBDIRS),-I$(dir)/include) \
+			-I$(CURDIR)/$(BUILD)
 
 export LIBPATHS	:=	$(foreach dir,$(LIBDIRS),-L$(dir)/lib)
 
-ifeq ($(strip $(CONFIG_JSON)),)
-	jsons := $(wildcard *.json)
-	ifneq (,$(findstring $(TARGET).json,$(jsons)))
-		export APP_JSON := $(TOPDIR)/$(TARGET).json
-	else
-		ifneq (,$(findstring config.json,$(jsons)))
-			export APP_JSON := $(TOPDIR)/config.json
-		endif
-	endif
-else
-	export APP_JSON := $(TOPDIR)/$(CONFIG_JSON)
-endif
-
-ifeq ($(strip $(ICON)),)
-	icons := $(wildcard *.jpg)
-	ifneq (,$(findstring $(TARGET).jpg,$(icons)))
-		export APP_ICON := $(TOPDIR)/$(TARGET).jpg
-	else
-		ifneq (,$(findstring icon.jpg,$(icons)))
-			export APP_ICON := $(TOPDIR)/icon.jpg
-		endif
-	endif
-else
-	export APP_ICON := $(TOPDIR)/$(ICON)
-endif
-
-ifeq ($(strip $(NO_ICON)),)
-	export NROFLAGS += --icon=$(APP_ICON)
-endif
-
-ifeq ($(strip $(NO_NACP)),)
-	export NROFLAGS += --nacp=$(CURDIR)/$(OUTDIR)/$(TARGET).nacp
-endif
-
-ifneq ($(APP_TITLEID),)
-	export NACPFLAGS += --titleid=$(APP_TITLEID)
-endif
-
-ifneq ($(ROMFS),)
-	export NROFLAGS += --romfsdir=$(CURDIR)/$(ROMFS)
-endif
+export BUILD_EXEFS_SRC := $(TOPDIR)/$(EXEFS_SRC)
 
 .PHONY: $(BUILD) clean all
 
 #---------------------------------------------------------------------------------
 all: $(BUILD)
-
 
 $(BUILD):
 	@[ -d $@ ] || mkdir -p $@
@@ -160,6 +125,7 @@ $(BUILD):
 
 #---------------------------------------------------------------------------------
 clean:
+	@echo clean ...
 	@rm -fr $(BUILD) $(OUTDIR)
 
 #---------------------------------------------------------------------------------

@@ -4,6 +4,10 @@
 #include "../config.h"
 #include "../ipc.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 bool sysheloIpcRunning();
 Result sysheloIpcInitialize(void);
 void sysheloIpcExit(void);
@@ -15,3 +19,7 @@ Result sysheloIpcSetEnabled(bool enabled);
 Result sysheloIpcExitCmd();
 Result sysheloIpcGetConfigValues(SysHeloConfigValueList* out_configValues);
 Result sysheloIpcSetConfigValues(SysHeloConfigValueList* configValues);
+
+#ifdef __cplusplus
+}   // extern "C"
+#endif

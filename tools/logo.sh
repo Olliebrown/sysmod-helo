@@ -14,4 +14,3 @@ function render() {
 
 render "$FONT" "$FONT_SIZE" "$TEXT" info:
 render "$FONT" "$FONT_SIZE" "$TEXT" "RGBA:$DEST"
-render "$FONT" "$FONT_SIZE" "$TEXT" "$DEST.png"

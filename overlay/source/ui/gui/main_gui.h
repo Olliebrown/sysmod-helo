@@ -1,9 +1,13 @@
+#pragma once
+
 #include <tesla.hpp>    // The Tesla Header
 
-class MainGui : public tsl::Gui {
+#include "base_gui.h"
+
+class MainGui : public BaseGui {
 public:
     MainGui();
-    virtual ~MainGui();
-    
-    virtual tsl::elm::Element* createUI() override;
+    ~MainGui();
+
+    tsl::elm::Element* baseUI() override;
 };

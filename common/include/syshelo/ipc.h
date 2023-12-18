@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdint.h>
+#include "manager.h"
 
 // Whenever the IPC commands listed below change, increment this version number
 #define SYSHELO_IPC_API_VERSION 1

@@ -11,7 +11,7 @@
 #pragma once
 
 #include <tesla.hpp>
-#include "../gui/base_gui.h"
+#include "base_gui.h"
 
 class BaseFrame : public tsl::elm::HeaderOverlayFrame
 {

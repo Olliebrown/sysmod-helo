@@ -43,7 +43,7 @@ export function uploadEverything () {
     }
 
     // Upload overlay
-    await uploadFile(client, OVERLAY_FROM_DIR, 'overlay.ovl', '/switch/.overlays', `${SYSMOD_NAME}.ovl`)
+    await uploadFile(client, OVERLAY_FROM_DIR, 'overlay.ovl', '/switch/.overlays', `${SYSMOD_NAME}-overlay.ovl`, false)
   })
 }
 

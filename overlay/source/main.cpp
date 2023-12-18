@@ -5,6 +5,10 @@
 #include <syshelo.h>
 #include <syshelo/client/ipc.h>
 
+// Custom GUI objects
+#include "ui/gui/main_gui.h"
+#include "ui/gui/fatal_gui.h"
+
 class OverlaySysHelo : public tsl::Overlay {
     virtual void exitServices() override {
         sysheloIpcExit();
